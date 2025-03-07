@@ -69,12 +69,16 @@ if os.path.exists(RANKING_FILE):
                 if points.isdigit():
                     current_ranking[user] = int(points)
 
-# Procesar archivos nuevos sin duplicar retos ya registrados
+# Procesar archivos nuevos sin contar `.gitkeep` ni directorios vacíos
 for file in new_files:
     parts = file.split("/")
 
-    # Detectar retos nuevos
-    if len(parts) > 1 and "retos" in parts[0] and "reto-" in parts[1]:
+    # Ignorar archivos `.gitkeep` y archivos ocultos
+    if file.endswith(".gitkeep") or file.startswith("."):
+        continue
+
+    # Detectar retos nuevos **solo si el archivo README.md fue agregado**
+    if len(parts) > 2 and "retos" in parts[0] and "reto-" in parts[1] and parts[-1] == "README.md":
         challenge_name = parts[1]
         user = challenge_name.split("-")[-1]
 
