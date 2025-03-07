@@ -16,9 +16,14 @@ ranking = collections.defaultdict(int)
 # Cargar retos ya procesados
 if os.path.exists(PROCESSED_FILE):
     with open(PROCESSED_FILE, "r") as f:
-        processed_challenges = set(json.load(f))
+        processed_challenges = json.load(f)
 else:
-    processed_challenges = set()
+    processed_challenges = {"challenges": set(), "solutions": set(), "updates": set()}
+
+# Convertir a sets (por seguridad si vienen de JSON)
+processed_challenges["challenges"] = set(processed_challenges["challenges"])
+processed_challenges["solutions"] = set(processed_challenges["solutions"])
+processed_challenges["updates"] = set(processed_challenges["updates"])
 
 # Obtener cambios en Git (archivos nuevos y modificados)
 def get_git_changes(diff_filter):
@@ -43,15 +48,11 @@ if event_file and os.path.exists(event_file):
         added_files = event.get("pull_request", {}).get("added_files", [])
         if isinstance(added_files, list):
             new_files.update(added_files)
-        else:
-            print(f"🚨 DEBUG WARNING: 'added_files' is not a list: {added_files}")
 
         # Obtener archivos modificados
         changed_files = event.get("pull_request", {}).get("changed_files", [])
         if isinstance(changed_files, list):
             modified_files.update(changed_files)
-        else:
-            print(f"🚨 DEBUG WARNING: 'changed_files' is not a list: {changed_files}")
 
 # Depuración: Imprimir archivos detectados
 print(f"📝 DEBUG: New files detected: {new_files}")
@@ -74,43 +75,52 @@ if os.path.exists(RANKING_FILE):
 for file in new_files:
     parts = file.split("/")
     
-    # Detectar retos nuevos (evitar el template)
+    # Detectar retos nuevos
     if len(parts) > 1 and "retos" in parts[0] and "reto-" in parts[1]:
         challenge_name = parts[1]
         user = challenge_name.split("-")[-1]
 
-        if "template" not in challenge_name and challenge_name not in processed_challenges:
+        if "template" not in challenge_name and challenge_name not in processed_challenges["challenges"]:
             print(f"✅ DEBUG: New challenge detected '{challenge_name}' by user '{user}'")
             ranking[user] += POINTS_CREATE_CHALLENGE
-            processed_challenges.add(challenge_name)  # Guardar en el set
+            processed_challenges["challenges"].add(challenge_name)
         else:
             print(f"🚫 DEBUG: Ignoring template challenge '{challenge_name}'")
 
     # Detectar soluciones nuevas
     elif "submissions" in parts and file.endswith(".ipynb"):
         user = parts[-1].replace(".ipynb", "").split("-")[-1]
-        print(f"✅ DEBUG: New solution submitted by '{user}'")
-        ranking[user] += POINTS_SUBMIT_SOLUTION
+        solution_id = file  # Identificar solución única
 
-# Procesar archivos modificados
+        if solution_id not in processed_challenges["solutions"]:
+            print(f"✅ DEBUG: New solution submitted by '{user}'")
+            ranking[user] += POINTS_SUBMIT_SOLUTION
+            processed_challenges["solutions"].add(solution_id)
+        else:
+            print(f"🚫 DEBUG: Solution '{solution_id}' already processed")
+
+# Procesar archivos modificados (mejoras en retos existentes)
 for file in modified_files:
     parts = file.split("/")
     
-    # Detectar mejoras en retos existentes (evitar el template)
+    # Detectar mejoras en retos existentes
     if len(parts) > 1 and "retos" in parts[0] and "reto-" in parts[1]:
         challenge_name = parts[1]
         user = challenge_name.split("-")[-1]
+        update_id = file  # Identificar modificación única
 
-        if "template" not in challenge_name and challenge_name not in processed_challenges:
+        if "template" not in challenge_name and update_id not in processed_challenges["updates"]:
             print(f"🔄 DEBUG: Challenge '{challenge_name}' modified by '{user}'")
             ranking[user] += POINTS_UPDATE_CHALLENGE
-            processed_challenges.add(challenge_name)  # Guardar en el set
+            processed_challenges["updates"].add(update_id)
         else:
-            print(f"🚫 DEBUG: Ignoring template update '{challenge_name}'")
+            print(f"🚫 DEBUG: Update '{update_id}' already processed")
 
 # Guardar la lista de retos procesados
 with open(PROCESSED_FILE, "w") as f:
-    json.dump(list(processed_challenges), f)
+    json.dump(
+        {key: list(value) for key, value in processed_challenges.items()}, f
+    )
 
 # Sumar los nuevos puntajes a los existentes
 for user, points in current_ranking.items():
