@@ -14,12 +14,17 @@ PROCESSED_FILE = "processed_challenges.json"
 ranking = collections.defaultdict(int)
 
 # Cargar retos ya procesados
-if os.path.exists(PROCESSED_FILE):
+if os.path.exists(PROCESSED_FILE) and os.path.getsize(PROCESSED_FILE) > 0:
     with open(PROCESSED_FILE, "r") as f:
-        processed_data = json.load(f)
-        processed_challenges = set(processed_data.get("challenges", []))
-        processed_solutions = set(processed_data.get("solutions", []))
-        processed_updates = set(processed_data.get("updates", []))
+        try:
+            processed_data = json.load(f)
+            processed_challenges = set(processed_data.get("challenges", []))
+            processed_solutions = set(processed_data.get("solutions", []))
+            processed_updates = set(processed_data.get("updates", []))
+        except json.JSONDecodeError:
+            processed_challenges = set()
+            processed_solutions = set()
+            processed_updates = set()
 else:
     processed_challenges = set()
     processed_solutions = set()
@@ -31,12 +36,12 @@ def get_git_changes(diff_filter):
         output = subprocess.check_output(
             f"git log --diff-filter={diff_filter} --name-only --pretty=''", shell=True
         ).decode().split("\n")
-        return [file.strip() for file in output if file.strip()]
+        return {file.strip() for file in output if file.strip()}
     except subprocess.CalledProcessError:
-        return []
+        return set()
 
-new_files = set(get_git_changes("A"))
-modified_files = set(get_git_changes("M"))
+new_files = get_git_changes("A")
+modified_files = get_git_changes("M")
 
 # Verificar si GitHub Actions proporciona datos adicionales
 event_file = os.getenv("GITHUB_EVENT_PATH", "")
@@ -82,8 +87,6 @@ for file in new_files:
             print(f"✅ DEBUG: New challenge detected '{challenge_name}' by user '{user}'")
             ranking[user] += POINTS_CREATE_CHALLENGE
             processed_challenges.add(challenge_name)  # Guardar en el set
-        else:
-            print(f"🚫 DEBUG: Ignoring template challenge '{challenge_name}'")
 
     # Detectar soluciones nuevas
     elif "submissions" in parts and file.endswith(".ipynb"):
@@ -106,16 +109,14 @@ for file in modified_files:
             print(f"🔄 DEBUG: Challenge '{challenge_name}' modified by '{user}'")
             ranking[user] += POINTS_UPDATE_CHALLENGE
             processed_updates.add(file)
-        else:
-            print(f"🚫 DEBUG: Ignoring already updated challenge '{challenge_name}'")
 
-# Guardar la lista de retos procesados
+# Guardar la lista de retos procesados correctamente
 with open(PROCESSED_FILE, "w") as f:
     json.dump({
         "challenges": list(processed_challenges),
         "solutions": list(processed_solutions),
         "updates": list(processed_updates)
-    }, f)
+    }, f, indent=4)
 
 # Sumar los nuevos puntajes a los existentes
 for user, points in current_ranking.items():
