@@ -2,8 +2,9 @@
 
 | User | Points |
 |---------|--------|
-| testuser | 320 |
-| jasonssdev | 40 |
-| jssdev1 | 40 |
+| testuser | 480 |
+| jasonssdev | 80 |
+| jssdev1 | 80 |
+| jason123 | 40 |
 
 🚀 **Keep contributing to climb up the ranking!**
