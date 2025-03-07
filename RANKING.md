@@ -2,5 +2,6 @@
 
 | User | Points |
 |---------|--------|
+| testuser | 160 |
 
 🚀 **Keep contributing to climb up the ranking!**
