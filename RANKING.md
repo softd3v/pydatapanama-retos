@@ -2,6 +2,6 @@
 
 | User | Points |
 |---------|--------|
-| jasonssdev | 240 |
+| jasonssdev | 280 |
 
 🚀 **Keep contributing to climb up the ranking!**
