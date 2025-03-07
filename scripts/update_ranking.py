@@ -8,22 +8,30 @@ POINTS_CREATE_CHALLENGE = 40
 POINTS_SUBMIT_SOLUTION = 30
 POINTS_UPDATE_CHALLENGE = 10
 
-# Archivo de ranking
+# Archivos donde se guarda el ranking y los retos procesados
 RANKING_FILE = "RANKING.md"
+PROCESSED_FILE = "processed_challenges.json"
 ranking = collections.defaultdict(int)
+
+# Cargar retos ya procesados
+if os.path.exists(PROCESSED_FILE):
+    with open(PROCESSED_FILE, "r") as f:
+        processed_challenges = set(json.load(f))
+else:
+    processed_challenges = set()
 
 # Obtener cambios en Git (archivos nuevos y modificados)
 def get_git_changes(diff_filter):
     try:
         output = subprocess.check_output(
-            f"git diff --diff-filter={diff_filter} --name-only HEAD~1..HEAD", shell=True
+            f"git log --diff-filter={diff_filter} --name-only --pretty=''", shell=True
         ).decode().split("\n")
         return [file.strip() for file in output if file.strip()]
     except subprocess.CalledProcessError:
         return []
 
-new_files = set(get_git_changes("A"))  # Archivos añadidos en el último commit
-modified_files = set(get_git_changes("M"))  # Archivos modificados
+new_files = set(get_git_changes("A"))
+modified_files = set(get_git_changes("M"))
 
 # Verificar si GitHub Actions proporciona datos adicionales
 event_file = os.getenv("GITHUB_EVENT_PATH", "")
@@ -47,13 +55,10 @@ if os.path.exists(RANKING_FILE):
                 parts = line.split("|")
                 user = parts[1].strip()
                 points = parts[2].strip()
-                if points.isdigit():  # Asegurar que sean números
+                if points.isdigit():
                     current_ranking[user] = int(points)
 
-# Para evitar sumar puntos múltiples veces por reto, usamos un set
-processed_challenges = set()
-
-# Procesar archivos nuevos (solo los que Git muestra como añadidos)
+# Procesar archivos nuevos (solo retos que no han sido procesados antes)
 for file in new_files:
     parts = file.split("/")
     
@@ -61,11 +66,11 @@ for file in new_files:
     if len(parts) > 1 and "retos" in parts[0] and "reto-" in parts[1]:
         challenge_name = parts[1]
         user = challenge_name.split("-")[-1]
-        
+
         if "template" not in challenge_name and challenge_name not in processed_challenges:
             print(f"✅ DEBUG: New challenge detected '{challenge_name}' by user '{user}'")
             ranking[user] += POINTS_CREATE_CHALLENGE
-            processed_challenges.add(challenge_name)
+            processed_challenges.add(challenge_name)  # Guardar en el set
         else:
             print(f"🚫 DEBUG: Ignoring template challenge '{challenge_name}'")
 
@@ -87,13 +92,17 @@ for file in modified_files:
         if "template" not in challenge_name and challenge_name not in processed_challenges:
             print(f"🔄 DEBUG: Challenge '{challenge_name}' modified by '{user}'")
             ranking[user] += POINTS_UPDATE_CHALLENGE
-            processed_challenges.add(challenge_name)
+            processed_challenges.add(challenge_name)  # Guardar en el set
         else:
             print(f"🚫 DEBUG: Ignoring template update '{challenge_name}'")
 
+# Guardar la lista de retos procesados
+with open(PROCESSED_FILE, "w") as f:
+    json.dump(list(processed_challenges), f)
+
 # Sumar los nuevos puntajes a los existentes
 for user, points in current_ranking.items():
-    ranking[user] += points  # Acumulamos en lugar de sobrescribir
+    ranking[user] += points
 
 # Ordenar y escribir el nuevo ranking
 ranking_sorted = sorted(ranking.items(), key=lambda x: x[1], reverse=True)
