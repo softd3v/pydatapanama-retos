@@ -38,8 +38,20 @@ event_file = os.getenv("GITHUB_EVENT_PATH", "")
 if event_file and os.path.exists(event_file):
     with open(event_file, "r") as f:
         event = json.load(f)
-        new_files.update(event.get("pull_request", {}).get("added_files", []))
-        modified_files.update(event.get("pull_request", {}).get("changed_files", []))
+        
+        # Obtener archivos agregados
+        added_files = event.get("pull_request", {}).get("added_files", [])
+        if isinstance(added_files, list):
+            new_files.update(added_files)
+        else:
+            print(f"🚨 DEBUG WARNING: 'added_files' is not a list: {added_files}")
+
+        # Obtener archivos modificados
+        changed_files = event.get("pull_request", {}).get("changed_files", [])
+        if isinstance(changed_files, list):
+            modified_files.update(changed_files)
+        else:
+            print(f"🚨 DEBUG WARNING: 'changed_files' is not a list: {changed_files}")
 
 # Depuración: Imprimir archivos detectados
 print(f"📝 DEBUG: New files detected: {new_files}")
