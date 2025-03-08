@@ -6,7 +6,7 @@ Cada reto es un ejercicio diseñado para mejorar habilidades en manipulación de
 
 ---
 
-## 📌 ¿Cómo estructurar un nuevo reto?
+## 📀 ¿Cómo estructurar un nuevo reto?
 Cada reto debe seguir la estructura estándar para garantizar que pueda ser entendido, resuelto y evaluado fácilmente.
 
 ### 📂 **Estructura de un reto**
@@ -14,20 +14,22 @@ Cada reto debe estar dentro de una carpeta con el siguiente formato:
 ```plaintext
 📂 retos/
  ├── 📂 reto-{nombre-del-reto}-{usuario}/  # Carpeta con el reto
- │   ├── 📜 README.md      # Explicación del reto y reglas
+ │   ├── 🐜 README.md     # Explicación del reto y reglas
  │   ├── 📂 data/         # Datos necesarios para el reto (si aplica)
+ │   ├── 📂 notebooks/    # Notebooks del reto (si aplica)
  │   ├── 📂 src/          # Código base del reto (si aplica)
- │   ├── 📂 tests/        # Pruebas unitarias para validar soluciones
- │   ├── 📂 submissions/  # Soluciones enviadas por los participantes
+ │   ├── 📂 tests/        # Pruebas unitarias para validar soluciones (si aplica)
+ │   └── 📂 submissions/  # Soluciones enviadas por los participantes
 ```
 📢 **Ejemplo real:**
 ```plaintext
 📂 retos/reto-contar-vocales-jasonssdev/
- ├── README.md
- ├── data/
- ├── src/
- ├── tests/
- ├── submissions/
+ ├─ README.md
+ ├─ data/
+ ├─ notebooks/
+ ├─ src/
+ ├─ tests/
+ └─ submissions/
 ```
 
 ---
@@ -52,20 +54,29 @@ Cada reto debe contener al menos:
 
 Opcionalmente, puedes agregar:
 - **data/** → Si el reto usa datasets, deben guardarse aquí.
+- **notebooks/** → Si el reto usa notebooks, deben guardarse aquí.
 - **src/** → Código base o archivos auxiliares.
 - **tests/** → Pruebas automatizadas para validar soluciones.
 
 ---
 
 ## 🚀 **Cómo agregar un nuevo reto**
-Sigue estos pasos para crear un nuevo reto:
 
-### 1️⃣ **Crea un nuevo branch con tu usuario**
+### 1️⃣ **Haz un Fork del repositorio**
+Entra al repositorio en GitHub y presiona el botón [Fork](https://github.com/pydatapanama/pydatapanama-retos/fork) en la esquina superior derecha.
+
+### 2️⃣ **Clona tu Fork en tu máquina local**
+```bash
+git clone https://github.com/tu-usuario/pydatapanama-retos.git
+cd pydatapanama-retos
+```
+
+### 3️⃣ **Crea un nuevo branch con tu usuario**
 ```bash
 git checkout -b reto-{nombre-del-reto}-{tu_usuario}
 ```
 
-### 2️⃣ **Copia la plantilla de reto**
+### 4️⃣ **Copia la plantilla de reto**
 ```bash
 cp -r retos/reto-template-usuario retos/reto-{nombre-del-reto}-{tu_usuario}
 ```
@@ -74,12 +85,12 @@ cp -r retos/reto-template-usuario retos/reto-{nombre-del-reto}-{tu_usuario}
 cp -r retos/reto-template-usuario retos/reto-analizar-ventas-maria123
 ```
 
-### 3️⃣ **Edita el README.md del reto**
+### 5️⃣ **Edita el README.md del reto**
 - Explica claramente el problema.
 - Indica los criterios de evaluación.
 - Agrega ejemplos si es necesario.
 
-### 4️⃣ **Sube tu reto y haz un Pull Request**
+### 6️⃣ **Sube tu reto y haz un Pull Request**
 ```bash
 git add .
 git commit -m "🚀 Agregando nuevo reto sobre {tema}"
@@ -91,17 +102,41 @@ Luego, ve a **GitHub** y crea un **Pull Request** para que tu reto sea revisado 
 ---
 
 ## 🎯 **Cómo resolver un reto**
-Si quieres resolver un reto existente:
-1️⃣ Entra a la carpeta del reto.
-2️⃣ Agrega tu solución en `submissions/` en formato **Jupyter Notebook (`.ipynb`)** con tu usuario en el nombre.
+
+### 1️⃣ **Haz un Fork del repositorio**
+Si aún no lo has hecho, haz un Fork del repositorio en GitHub: [Fork](https://github.com/pydatapanama/pydatapanama-retos/fork).
+
+### 2️⃣ **Clona tu Fork en tu máquina local**
+```bash
+git clone https://github.com/tu-usuario/pydatapanama-retos.git
+cd pydatapanama-retos
+```
+
+### 3️⃣ **Crea un nuevo branch con tu usuario**
+```bash
+git checkout -b solucion-{nombre-del-reto}-{tu_usuario}
+```
+
+### 4️⃣ **Agrega tu solución en `submissions/`**
+- Asegúrate de que tu solución sea un **Jupyter Notebook (`.ipynb`)**.
+- Guarda el archivo con tu usuario en el nombre.
+
+📢 **Ejemplo:**
 ```bash
 cd retos/reto-analizar-ventas-maria123/submissions
-touch maria123.ipynb
+touch solucion-maria123.ipynb
 ```
-3️⃣ Sigue los pasos de Git para subir tu solución y hacer un **Pull Request**.
+
+### 5️⃣ **Sube tu solución y haz un Pull Request**
+```bash
+git add .
+git commit -m "📚 Agregando solución al reto {nombre-del-reto}"
+git push origin solucion-{nombre-del-reto}-{tu_usuario}
+```
+
+Luego, ve a **GitHub** y crea un **Pull Request** para que tu solución sea revisada e integrada.
 
 ---
 
 ## 🌟 **¡Gracias por contribuir!**
 Si tienes dudas, pregunta en nuestra comunidad o abre un Issue en GitHub. 🚀
-
