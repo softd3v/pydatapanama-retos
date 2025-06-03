@@ -18,17 +18,22 @@ Este notebook tiene como propósito presentar un reto de programación para la c
 
 ### Pregunta 1: ¿Cuántos pokemones hay en total?
 ```python
-#
+#1025
 ```
 
 ### Pregunta 2: ¿Cuáles son los 5 tipos más comunes (columna `Primary Typing`)?
 ```python
-#
+#Primary Typing
+water     145
+normal    128
+grass     113
+bug        89
+fire       77
 ```
 
 ### Pregunta 3: ¿Cuál es el promedio de Velocidad `(Speed)` de todos los pokemones?
 ```python
-#
+#69.72888513513513
 ```
 
 ---
@@ -37,17 +42,24 @@ Este notebook tiene como propósito presentar un reto de programación para la c
 
 ### Pregunta 4: ¿Cuál es la correlación entre las estadísticas `Attack`, `Defense` y `Speed`? Muestra un heatmap.
 ```python
-#
+#Matriz de Correlación:
+           Attack   Defense     Speed
+Attack   1.000000  0.478244  0.375029
+Defense  0.478244  1.000000  0.002947
+Speed    0.375029  0.002947  1.000000
 ```
 
 ### Pregunta 5: ¿Qué tipo (`Primary Typing`) tiene el mayor promedio de `Attack`?
 ```python
-#
+Tipo con el mayor promedio de Attack:
+Primary Typing
+dragon    105.979167
+Name: Attack, dtype: float64
 ```
 
 ### Pregunta 6: Crear un histograma de la variable `Speed`
 ```python
-#
+# 
 ```
 
 ---
@@ -56,7 +68,18 @@ Este notebook tiene como propósito presentar un reto de programación para la c
 
 ### Pregunta 7: ¿Qué pokemones tienen estadísticas totales (`Base Stat Total`) superiores al percentil 90? ¿Qué tipos predominan en este grupo?
 ```python
-#
+# Tipos predominantes en el grupo con Base Stat Total superior al percentil 90:
+dragon: 35
+psychic: 29
+steel: 18
+flying: 13
+fighting: 11
+water: 11
+fire: 10
+rock: 5
+bug: 4
+electric: 4
+poison: 4
 ```
 
 ### Pregunta 8: Clasifica a los pokemones en tres categorías según su `Base Stat Total`: "Débil", "Normal" y "Fuerte". Luego, muestra la distribución de estas categorías en un gráfico de barras.
